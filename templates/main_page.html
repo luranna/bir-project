@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.w3.org/1999/xhtml">
+
+<head>
+	<title>BIR Project</title>
+	<link rel="icon" href="/static/img/favicon.png">
+	<link rel="stylesheet" href="/static/styles4.css">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta charset="UTF-8">
+  <style> 
+    body {
+      background-color: #a5baf2;
+      background-repeat: no-repeat;
+      background-size: cover;
+      margin:auto;
+    }
+    </style>
+    <header>
+      <h1>Heating system</h1>
+      <h2>Stay informed with real-time temperature and battery updates</h2>
+      <nav>
+        <a href="/">Main page</a>
+      </nav>
+    </header>
+</head>
+
+</head>
+<body>
+
+  <h3>Current temperature: {{data.currentTempValue}} &deg Celsius</h3>
+  <br>
+  <h3> Heating parameter limits: </h3>
+  <p>
+    <p> Minimum value: {{data.minTempValue}} &deg Celsius </p>
+    <p> Maximum value: {{data.maxTempValue}} &deg Celsius </p> 
+    
+  </p> 
+  <br>
+  <h3>Change heating parameter limits:</h3>
+    <form method="post" action="/update-temp-limits/" >
+        <label for="minTemp">Minimum temperature value:</label><br>
+        <input type="text" id="minTemp" name="minTemp" ><br>
+        <label for="maxTemp">Maximum temperature value:</label><br>
+        <input type="text" id="maxTemp" name="maxTemp"><br><br>
+        <input type="submit" value="Submit">
+    </form> 
+</p>
+</body>
+</html>
