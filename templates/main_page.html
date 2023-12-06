@@ -9,15 +9,15 @@
 	<meta charset="UTF-8">
   <style> 
     body {
-      background-color: #a5baf2;
+      background-color: #F9E8D2;
+      height: 80vh;
       background-repeat: no-repeat;
       background-size: cover;
       margin:auto;
     }
     </style>
     <header>
-      <h1>Heating system</h1>
-      <h2>Stay informed with real-time temperature and battery updates</h2>
+      <h1>HEATING SYSTEM</h1>
       <nav>
         <a href="/">Main page</a>
       </nav>
@@ -27,7 +27,7 @@
 </head>
 <body>
 
-  <h3>Current temperature: {{data.currentTempValue}} &deg Celsius</h3>
+  <h2>Current temperature: {{data.currentTempValue}} &deg Celsius</h2>
   <br>
   <h3> Heating parameter limits: </h3>
   <p>
@@ -37,12 +37,14 @@
   </p> 
   <br>
   <h3>Change heating parameter limits:</h3>
-    <form method="post" action="/update-temp-limits/" >
+    <form method="post" action="/update-temp-limits/">
+        <center>
         <label for="minTemp">Minimum temperature value:</label><br>
-        <input type="text" id="minTemp" name="minTemp" ><br>
+        <input type="text" id="minTemp" name="minTemp"><br>
         <label for="maxTemp">Maximum temperature value:</label><br>
         <input type="text" id="maxTemp" name="maxTemp"><br><br>
         <input type="submit" value="Submit">
+        </center>
     </form> 
 </p>
 </body>

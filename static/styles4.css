@@ -25,25 +25,32 @@ h1 {
     font-size: 2.5rem;
     width: 100%;
     letter-spacing: .5rem;
+    color: black;
+    margin: 20px 0px;
+    height: 30px;
 }
 
 h2 {
     font-family: Helvetica, sans-serif;
     text-align: center;
     font-size: 1.5rem;
-    color:black;
+    color:#404040;
+    
 }
 
 h3 {
     font-family: Helvetica, sans-serif;
-    text-align: left;
+    text-align: center;
     font-size: 1.5rem;
-    color:black;
+    color:#404040;
+    margin: 10px 350px;
+    background:#ccc;
+    border-radius:10px;
 }
 
 p {
     font-family: Helvetica, sans-serif;
-    text-align: left;
+    text-align: center;
     font-size: 1rem;
     color:black;
 }
@@ -54,12 +61,13 @@ input[type=button], input[type=submit], input[type=reset] {
     color: white;
     padding: 16px 32px;
     text-decoration: none;
-    margin: 4px 2px;
+    margin: 4px 550px;
     cursor: pointer;
     box-sizing: border-box;
+    border-radius:10px;
   }
   input[type=text] {
     padding: 12px 20px;
-    margin: 8px 0;
+    margin: 8px 500px;
     box-sizing: border-box;
   }
