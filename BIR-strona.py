@@ -42,26 +42,33 @@ async def get_temp_limits(request: Request):
 @app.post("/update-temp-limits/")
 async def update_temp_limits(request: Request, minTemp: str = Form(None), maxTemp=Form(None)):
     redirect_url = request.url_for('home') 
-    if minTemp is None or not minTemp.isnumeric():
+    if minTemp is None or not is_number(minTemp):
         minTemp=app.minTempValue
-        if int(maxTemp) < int(app.minTempValue):
+        if float(maxTemp) < float(app.minTempValue):
             app.maxTempValue = app.minTempValue
             app.minTempValue = maxTemp
             return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER) 
-    if maxTemp is None or not maxTemp.isnumeric():
-        if int(minTemp) > int(app.maxTempValue):
+    if maxTemp is None or not is_number(maxTemp):
+        if float(minTemp) > float(app.maxTempValue):
             app.minTempValue = app.maxTempValue
             app.maxTempValue = minTemp
             return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER) 
         maxTemp=app.maxTempValue   
-    app.minTempValue=minTemp
-    app.maxTempValue=maxTemp
-    if int(app.minTempValue) > int(app.maxTempValue):
+    minTemp=float(minTemp)
+    maxTemp=float(maxTemp)
+    app.minTempValue=round(minTemp,2)
+    app.maxTempValue=round(maxTemp,2)
+    if app.minTempValue > app.maxTempValue:
         app.minTempValue , app.maxTempValue = app.maxTempValue, app.minTempValue 
     data={"minTempValue": app.minTempValue,  "maxTempValue":app.maxTempValue} 
     return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER) 
 
-
+def is_number(n):
+    try:
+        float(n)
+    except ValueError:
+        return False
+    return True
 
 #testowe requesty:curl -X 'POST' \
 #  'http://127.0.0.1:8000/update-data' \
