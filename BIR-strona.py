@@ -30,7 +30,7 @@ async def home(request: Request):
 
 @app.post("/temperature/")
 async def receive_temperature(request: Request, tempData: SystemData):
-    app.currentTempValue=tempData.temperature
+    app.currentTempValue=round(tempData.temperature,2)
     data={"minTempValue": app.minTempValue,  "maxTempValue":app.maxTempValue, "currentTempValue":app.currentTempValue} 
     return data
 
