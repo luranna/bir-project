@@ -18,7 +18,7 @@ class SystemData(BaseModel):
 
 app = FastAPI()
 ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
-ssl_context.load_cert_chain('cert.pem', keyfile='key.pem')
+ssl_context.load_cert_chain('./certs/server_cert.pem', keyfile='./certs/server_key.pem')
 
 templates = Jinja2Templates(directory="templates")
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -34,18 +34,18 @@ async def home(request: Request):
     return templates.TemplateResponse("main_page.html", {"request": request,"data": data})
 
 
-@app.post("/temperature/")
+@app.post("/temperature")
 async def receive_temperature(request: Request, tempData: SystemData):
     app.currentTempValue=round(tempData.temperature,2)
     data={"minTempValue": app.minTempValue,  "maxTempValue":app.maxTempValue, "currentTempValue":app.currentTempValue} 
     return data
 
-@app.get("/parameters/")
+@app.get("/parameters")
 async def get_temp_limits(request: Request):
     data={"minTempValue": app.minTempValue,  "maxTempValue":app.maxTempValue} 
     return data
 
-@app.post("/update-temp-limits/")
+@app.post("/update-temp-limits")
 async def update_temp_limits(request: Request, minTemp: str = Form(None), maxTemp=Form(None)):
     redirect_url = request.url_for('home') 
     if minTemp is None or not is_number(minTemp):
@@ -59,7 +59,7 @@ async def update_temp_limits(request: Request, minTemp: str = Form(None), maxTem
             app.minTempValue = app.maxTempValue
             app.maxTempValue = minTemp
             return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER) 
-        maxTemp=app.maxTempValue   
+        maxTemp=app.maxTempValue
     minTemp=float(minTemp)
     maxTemp=float(maxTemp)
     app.minTempValue=round(minTemp,2)
@@ -76,13 +76,5 @@ def is_number(n):
         return False
     return True
 
-
-
-#testowe requesty:curl -X 'POST' \
-#  'http://127.0.0.1:8000/update-data' \
-#  -H 'accept: application/json' \
-##  -H 'Content-Type: application/json' \
-# -d '{
-#  "name": "Maszyna",
-#  "temperature": 32
-#}'
+if __name__ == '__main__':
+    uvicorn.run(app, host="0.0.0.0", port=8080, ssl_keyfile="./certs/server_key.pem", ssl_certfile="./certs/server_cert.pem")
