@@ -1,4 +1,3 @@
-#start serwera komenda (wpisywane w terminalu)-> uvicorn BIR-strona:app --reload
 from typing import Union
 
 from fastapi import FastAPI, Form, Request, status
@@ -14,6 +13,7 @@ import uvicorn
 
 class SystemData(BaseModel):
     temperature: float
+    battery: int
 
 
 app = FastAPI()
@@ -26,18 +26,20 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 app.minTempValue = 20;
 app.maxTempValue = 30;
 app.currentTempValue=23;
+app.currentBatteryValue=100;
 
 
 @app.get("/", include_in_schema=False, response_class=HTMLResponse)
 async def home(request: Request):
-    data={"minTempValue": app.minTempValue,  "maxTempValue":app.maxTempValue, "currentTempValue":app.currentTempValue} 
+    data={"minTempValue": app.minTempValue,  "maxTempValue":app.maxTempValue, "currentTempValue":app.currentTempValue, "currentBatteryValue":app.currentBatteryValue} 
     return templates.TemplateResponse("main_page.html", {"request": request,"data": data})
 
 
-@app.post("/temperature")
-async def receive_temperature(request: Request, tempData: SystemData):
+@app.post("/update-data")
+async def receive_data(request: Request, tempData: SystemData):
     app.currentTempValue=round(tempData.temperature,2)
-    data={"minTempValue": app.minTempValue,  "maxTempValue":app.maxTempValue, "currentTempValue":app.currentTempValue} 
+    app.currentBatteryValue=tempData.battery
+    data={"minTempValue": app.minTempValue,  "maxTempValue":app.maxTempValue, "currentTempValue":app.currentTempValue, "currentBatteryValue":app.currentBatteryValue} 
     return data
 
 @app.get("/parameters")
