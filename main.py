@@ -1,14 +1,18 @@
-from typing import Union
+#start serwera komenda (wpisywane w terminalu)-> pip
 
-from fastapi import FastAPI, Form, Request, status
-from pydantic import BaseModel
-from typing_extensions import Annotated
-import requests
+from fastapi import FastAPI, Form, Header, Request, status, Response, Depends, HTTPException, Cookie
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, RedirectResponse
-import ssl
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
+from pydantic import BaseModel
+import logon
+import ssl
+from datetime import datetime, timedelta, timezone
+from jose import JWTError, jwt
+from passlib.context import CryptContext
+import requests
 import uvicorn
 
 class SystemData(BaseModel):
@@ -30,10 +34,68 @@ app.currentBatteryValue=100;
 
 
 @app.get("/", include_in_schema=False, response_class=HTMLResponse)
+async def home(request: Request, access_token: str = Cookie(None)):
+    if access_token is not None:
+        data={"minTempValue": app.minTempValue, "maxTempValue":app.maxTempValue, "currentTempValue":app.currentTempValue} 
+        return templates.TemplateResponse("main_page.html", {"request": request,"data": data})
+    else:
+        redirect_url = request.url_for('login') 
+        return RedirectResponse(redirect_url, status_code=status.HTTP_302_FOUND) 
+
+@app.get("/login/", include_in_schema=False, response_class=HTMLResponse)
 async def home(request: Request):
     data={"minTempValue": app.minTempValue,  "maxTempValue":app.maxTempValue, "currentTempValue":app.currentTempValue, "currentBatteryValue":app.currentBatteryValue} 
-    return templates.TemplateResponse("main_page.html", {"request": request,"data": data})
+    return templates.TemplateResponse("logon_page.html", {"request": request,"data": data})
 
+@app.post("/login/")
+async def login(response: Response, request: Request):
+    form = await request.form()
+    username = form.get("username")
+    password = form.get("password")
+    errors = []
+    if not username:
+        errors.append("Please Enter valid username")
+    if not password:
+        errors.append("Password enter password")
+    if len(errors) > 0:
+        return templates.TemplateResponse(
+            "logon_page.html", {"request": request, "errors": errors}
+        )
+    try:
+        usertemp =list(filter(lambda x:x["username"]==username,logon.users_data))
+        user=usertemp[0]["username"]
+        passw_db=usertemp[0]["hashed_password"]
+
+        if user is None:
+            errors.append("username does not exist")
+            return templates.TemplateResponse(
+                "logon_page.html", {"request": request, "errors": errors}
+            )
+        else:
+            if logon.verify_password(password, passw_db):
+                data = {"sub": username}
+                jwt_token = jwt.encode(
+                    data, logon.SECRET_KEY, algorithm=logon.ALGORITHM
+                )
+                msg = "Login Successful"
+                response = RedirectResponse(url="/")
+                
+             
+                response.set_cookie(
+                    key="access_token", value=f"Bearer {jwt_token}", httponly=True
+                )
+                response.status_code = status.HTTP_303_SEE_OTHER
+                return response
+            else:
+                errors.append("Invalid Password or Username")
+                return templates.TemplateResponse(
+                    "logon_page.html", {"request": request, "errors": errors}
+                )
+    except:
+        errors.append("Something Wrong while authentication or storing tokens!")
+        return templates.TemplateResponse(
+            "logon_page.html", {"request": request, "errors": errors}
+        )
 
 @app.post("/update-data")
 async def receive_data(request: Request, tempData: SystemData):
@@ -42,12 +104,12 @@ async def receive_data(request: Request, tempData: SystemData):
     data={"minTempValue": app.minTempValue,  "maxTempValue":app.maxTempValue, "currentTempValue":app.currentTempValue, "currentBatteryValue":app.currentBatteryValue} 
     return data
 
-@app.get("/parameters")
+@app.get("/parameters/")
 async def get_temp_limits(request: Request):
     data={"minTempValue": app.minTempValue,  "maxTempValue":app.maxTempValue} 
     return data
 
-@app.post("/update-temp-limits")
+@app.post("/update-temp-limits/")
 async def update_temp_limits(request: Request, minTemp: str = Form(None), maxTemp=Form(None)):
     redirect_url = request.url_for('home') 
     if minTemp is None or not is_number(minTemp):
@@ -61,7 +123,7 @@ async def update_temp_limits(request: Request, minTemp: str = Form(None), maxTem
             app.minTempValue = app.maxTempValue
             app.maxTempValue = minTemp
             return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER) 
-        maxTemp=app.maxTempValue
+        maxTemp=app.maxTempValue   
     minTemp=float(minTemp)
     maxTemp=float(maxTemp)
     app.minTempValue=round(minTemp,2)
@@ -78,5 +140,12 @@ def is_number(n):
         return False
     return True
 
-if __name__ == '__main__':
-    uvicorn.run(app, host="0.0.0.0", port=8080, ssl_keyfile="./certs/server_key.pem", ssl_certfile="./certs/server_cert.pem")
+@app.get("/test_cookie/")
+async def read_cookie(access_token: str = Cookie(None)):
+   return {"access_token": access_token}
+
+@app.get("/logout/")
+def logout(response : Response):
+ response.delete_cookie("access_token")
+ response = RedirectResponse(url="/login/")
+ return response
