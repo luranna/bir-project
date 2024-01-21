@@ -31,6 +31,8 @@ app.minTempValue = 20;
 app.maxTempValue = 30;
 app.currentTempValue=23;
 app.currentBatteryValue=100;
+app.minBatteryValue = 0;
+app.maxBatteryValue = 1000;
 
 
 @app.get("/", include_in_schema=False, response_class=HTMLResponse)
@@ -44,7 +46,7 @@ async def home(request: Request, access_token: str = Cookie(None)):
 
 @app.get("/login/", include_in_schema=False, response_class=HTMLResponse)
 async def home(request: Request):
-    data={"minTempValue": app.minTempValue,  "maxTempValue":app.maxTempValue, "currentTempValue":app.currentTempValue, "currentBatteryValue":app.currentBatteryValue} 
+    data={"minTempValue": app.minTempValue,  "maxTempValue":app.maxTempValue, "currentTempValue":app.currentTempValue, "currentBatteryValue":app.currentBatteryValue, "minBatteryValue": app.minBatteryValue,  "maxBatteryValue":app.maxBatteryValue} 
     return templates.TemplateResponse("logon_page.html", {"request": request,"data": data})
 
 @app.post("/login/")
@@ -104,9 +106,14 @@ async def receive_data(request: Request, tempData: SystemData):
     data={"minTempValue": app.minTempValue,  "maxTempValue":app.maxTempValue, "currentTempValue":app.currentTempValue, "currentBatteryValue":app.currentBatteryValue} 
     return data
 
-@app.get("/parameters/")
+@app.get("/temperature_parameters/")
 async def get_temp_limits(request: Request):
     data={"minTempValue": app.minTempValue,  "maxTempValue":app.maxTempValue} 
+    return data
+
+@app.get("/battery_parameters")
+async def get_battery_limits(request: Request):
+    data={"minBatteryValue": app.minBatteryValue,  "maxBatteryValue":app.maxBatteryValue} 
     return data
 
 @app.post("/update-temp-limits/")
