@@ -68,8 +68,6 @@ async def login(response: Response, request: Request):
         usertemp =list(filter(lambda x:x["username"]==username,logon.users_data))
         user=usertemp[0]["username"]
         passw_db=usertemp[0]["hashed_password"]
-    return templates.TemplateResponse("logon_page.html", {"request": request,"data": data})
-
 
         if user is None:
             errors.append("username does not exist")
@@ -222,3 +220,6 @@ def logout(response : Response):
  response.delete_cookie("access_token")
  response = RedirectResponse(url="/login/")
  return response
+
+if __name__ == "__main__":
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, ssl=ssl_context)
