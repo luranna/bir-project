@@ -29,11 +29,12 @@ app.currentTempValue=23;
 app.currentBatteryValue=100;
 app.minBatteryValue = 0;
 app.maxBatteryValue = 1000;
+app.systemMode="On";
 
 
 @app.get("/", include_in_schema=False, response_class=HTMLResponse)
 async def home(request: Request):
-    data={"minTempValue": app.minTempValue,  "maxTempValue":app.maxTempValue, "currentTempValue":app.currentTempValue, "currentBatteryValue":app.currentBatteryValue, "minBatteryValue": app.minBatteryValue,  "maxBatteryValue":app.maxBatteryValue} 
+    data={"minTempValue": app.minTempValue,  "maxTempValue":app.maxTempValue, "currentTempValue":app.currentTempValue, "currentBatteryValue":app.currentBatteryValue, "minBatteryValue": app.minBatteryValue,  "maxBatteryValue":app.maxBatteryValue, "systemMode":app.systemMode} 
     return templates.TemplateResponse("main_page.html", {"request": request,"data": data})
 
 
@@ -41,8 +42,30 @@ async def home(request: Request):
 async def receive_data(request: Request, tempData: SystemData):
     app.currentTempValue=round(tempData.temperature,2)
     app.currentBatteryValue=tempData.battery
-    data={"minTempValue": app.minTempValue,  "maxTempValue":app.maxTempValue, "currentTempValue":app.currentTempValue, "currentBatteryValue":app.currentBatteryValue, "minBatteryValue": app.minBatteryValue,  "maxBatteryValue":app.maxBatteryValue} 
+    data={"minTempValue": app.minTempValue,  "maxTempValue":app.maxTempValue, "currentTempValue":app.currentTempValue, "currentBatteryValue":app.currentBatteryValue, "minBatteryValue": app.minBatteryValue,  "maxBatteryValue":app.maxBatteryValue, "systemMode":app.systemMode} 
     return data
+
+
+@app.get("/update-system-mode-on")
+async def update_system_mode(request: Request):
+    redirect_url = request.url_for('home')
+    app.systemMode="On"
+    data={"minTempValue": app.minTempValue,  "maxTempValue":app.maxTempValue, "currentTempValue":app.currentTempValue, "currentBatteryValue":app.currentBatteryValue, "minBatteryValue": app.minBatteryValue,  "maxBatteryValue":app.maxBatteryValue, "systemMode":app.systemMode} 
+    return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
+
+@app.get("/update-system-mode-off")
+async def update_system_mode(request: Request):
+    redirect_url = request.url_for('home')
+    app.systemMode="Off"
+    data={"minTempValue": app.minTempValue,  "maxTempValue":app.maxTempValue, "currentTempValue":app.currentTempValue, "currentBatteryValue":app.currentBatteryValue, "minBatteryValue": app.minBatteryValue,  "maxBatteryValue":app.maxBatteryValue, "systemMode":app.systemMode} 
+    return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
+
+@app.get("/update-system-mode-auto")
+async def update_system_mode(request: Request):
+    redirect_url = request.url_for('home')
+    set_system_mode()
+    data={"minTempValue": app.minTempValue,  "maxTempValue":app.maxTempValue, "currentTempValue":app.currentTempValue, "currentBatteryValue":app.currentBatteryValue, "minBatteryValue": app.minBatteryValue,  "maxBatteryValue":app.maxBatteryValue, "systemMode":app.systemMode} 
+    return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
 
 @app.get("/temperature_parameters")
 async def get_temp_limits(request: Request):
@@ -54,8 +77,16 @@ async def get_battery_limits(request: Request):
     data={"minBatteryValue": app.minBatteryValue,  "maxBatteryValue":app.maxBatteryValue} 
     return data
 
+@app.get("/system-mode")
+async def get_system_mode(request: Request):
+    if("On" in app.systemMode):
+        data={"systemMode": "On"}
+    else:
+        data={"systemMode": "Off"}
+    return data
+
 @app.post("/update-temp-limits")
-async def update_temp_limits(request: Request, minTemp: str = Form(None), maxTemp=Form(None)):
+async def update_temp_limits(request: Request, minTemp= Form(None), maxTemp=Form(None)):
     redirect_url = request.url_for('home')
     if (minTemp is None or not is_number(minTemp)) and (maxTemp  is None or is_number(maxTemp)):
         return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER) 
@@ -77,11 +108,12 @@ async def update_temp_limits(request: Request, minTemp: str = Form(None), maxTem
     app.maxTempValue=round(maxTemp,2)
     if app.minTempValue > app.maxTempValue:
         app.minTempValue , app.maxTempValue = app.maxTempValue, app.minTempValue 
-    data={"minTempValue": app.minTempValue,  "maxTempValue":app.maxTempValue} 
+    set_system_mode()
+    data={"minTempValue": app.minTempValue,  "maxTempValue":app.maxTempValue, "systemMode":app.systemMode} 
     return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
 
 @app.post("/update-battery-limits")
-async def update_battery_limits(request: Request, minBattery: str = Form(None), maxBattery=Form(None)):
+async def update_battery_limits(request: Request, minBattery = Form(None), maxBattery=Form(None)):
     redirect_url = request.url_for('home') 
     if (minBattery is None or not is_number(minBattery)) and (maxBattery  is None or not is_number(maxBattery)):
         return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER) 
@@ -99,14 +131,17 @@ async def update_battery_limits(request: Request, minBattery: str = Form(None), 
         maxBattery=app.maxBatteryValue
     app.minBatteryValue=minBattery
     app.maxBatteryValue=maxBattery
-    print(app.minBatteryValue)
-    print(app.maxBatteryValue)
     if app.minBatteryValue > app.maxBatteryValue:
-        app.minBatteryValue , app.maxBatteryValue = app.maxBatteryValue, app.minBatteryValue 
-    data={"minBatteryValue": app.minBatteryValue,  "maxBatteryValue":app.maxBatteryValue} 
-    print(app.minBatteryValue)
-    print(app.maxBatteryValue)
+        app.minBatteryValue , app.maxBatteryValue = app.maxBatteryValue, app.minBatteryValue
+    set_system_mode()
+    data={"minBatteryValue": app.minBatteryValue,  "maxBatteryValue":app.maxBatteryValue, "systemMode":app.systemMode} 
     return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER) 
+
+def set_system_mode():
+    if((app.currentTempValue < app.maxTempValue) and (app.currentTempValue > app.minTempValue) and (app.currentBatteryValue <app.maxBatteryValue) and (app.currentBatteryValue > app.minBatteryValue)):
+       app.systemMode="Automatic (On)"
+    else:
+        app.systemMode="Automatic (Off)"
 
 def is_number(n):
     try:
