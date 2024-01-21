@@ -27,9 +27,24 @@
 
 </head>
 <body>
-
+  <h2>Current system mode: {{data.systemMode}}</h2>
   <h2>Current temperature: {{data.currentTempValue}} &deg Celsius</h2>
   <h2>Current level of battery: {{data.currentBatteryValue}} mV</h2>
+  <br>
+ 
+  <h3> Change system mode </h3>
+  <center>
+    <form action="/update-system-mode-on">
+      <input type="submit" value="On" />
+  </form>
+  <form action="/update-system-mode-off">
+    <input type="submit" value="Off" />
+</form>
+<form action="/update-system-mode-auto">
+  <input type="submit" value="Automatic" />
+</form>
+</center>
+  <br>
   <br>
   <h3> Heating parameter limits: </h3>
   <p>
@@ -37,15 +52,6 @@
     <p> Maximum value: {{data.maxTempValue}} &deg Celsius </p> 
     
   </p> 
-  <br>
-  <br>
-  <h3> Limits for battery operation: </h3>
-  <p>
-    <p> Minimum value: {{data.minBatteryValue}} mV</p>
-    <p> Maximum value: {{data.maxBatteryValue}} mV </p> 
-    
-  </p> 
-
   <h3>Change heating parameter limits:</h3>
     <form method="post" action="/update-temp-limits/">
         <center>
@@ -57,6 +63,12 @@
         </center>
     </form> 
 
+    <h3> Limits for battery operation: </h3>
+  <p>
+    <p> Minimum value: {{data.minBatteryValue}} mV</p>
+    <p> Maximum value: {{data.maxBatteryValue}} mV </p> 
+    
+  </p> 
     <h3>Change battery limits:</h3>
     <form method="post" action="/update-battery-limits">
         <center>
