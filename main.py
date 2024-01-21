@@ -1,5 +1,3 @@
-#start serwera komenda (wpisywane w terminalu)-> pip
-
 from fastapi import FastAPI, Form, Header, Request, status, Response, Depends, HTTPException, Cookie
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
