@@ -38,6 +38,14 @@
     
   </p> 
   <br>
+  <br>
+  <h3> Limits for battery operation: </h3>
+  <p>
+    <p> Minimum value: {{data.minBatteryValue}} mV</p>
+    <p> Maximum value: {{data.maxBatteryValue}} mV </p> 
+    
+  </p> 
+
   <h3>Change heating parameter limits:</h3>
     <form method="post" action="/update-temp-limits/">
         <center>
@@ -45,6 +53,17 @@
         <input type="text" id="minTemp" name="minTemp"><br>
         <label for="maxTemp">Maximum temperature value:</label><br>
         <input type="text" id="maxTemp" name="maxTemp"><br><br>
+        <input type="submit" value="Submit">
+        </center>
+    </form> 
+
+    <h3>Change battery limits:</h3>
+    <form method="post" action="/update-battery-limits">
+        <center>
+        <label for="minTemp">Minimum battery value:</label><br>
+        <input type="text" id="minBattery" name="minBattery"><br>
+        <label for="maxTemp">Maximum battery value:</label><br>
+        <input type="text" id="maxBattery" name="maxBattery"><br><br>
         <input type="submit" value="Submit">
         </center>
     </form> 
