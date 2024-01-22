@@ -28,11 +28,6 @@ users_data = [
         "disabled": False,
     }]
 
-json_data = '[{"name": "User", "age": 30}, {"name": "Admin", "age": 25}]'
-my_list = [item for item in json.loads(json_data)]
-
-
-
 class Token(BaseModel):
     access_token: str
     token_type: str
