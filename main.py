@@ -46,7 +46,7 @@ async def home(request: Request, access_token: str = Cookie(None)):
 @app.get("/login/", include_in_schema=False, response_class=HTMLResponse)
 async def home(request: Request):
     data={"minTempValue": app.minTempValue,  "maxTempValue":app.maxTempValue, "currentTempValue":app.currentTempValue, "currentBatteryValue":app.currentBatteryValue, "minBatteryValue": app.minBatteryValue,  "maxBatteryValue":app.maxBatteryValue, "systemMode":app.systemMode} 
-    return templates.TemplateResponse("main_page.html", {"request": request,"data": data})
+    return templates.TemplateResponse("logon_page.html", {"request": request,"data": data})
 
 @app.post("/login/")
 async def login(response: Response, request: Request):
