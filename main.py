@@ -37,7 +37,7 @@ app.systemMode="On";
 @app.get("/", include_in_schema=False, response_class=HTMLResponse)
 async def home(request: Request, access_token: str = Cookie(None)):
     if access_token is not None:
-        data={"minTempValue": app.minTempValue, "maxTempValue":app.maxTempValue, "currentTempValue":app.currentTempValue} 
+        data={"minTempValue": app.minTempValue,  "maxTempValue":app.maxTempValue, "currentTempValue":app.currentTempValue, "currentBatteryValue":app.currentBatteryValue, "minBatteryValue": app.minBatteryValue,  "maxBatteryValue":app.maxBatteryValue, "systemMode":app.systemMode} 
         return templates.TemplateResponse("main_page.html", {"request": request,"data": data})
     else:
         redirect_url = request.url_for('login') 
