@@ -15,7 +15,7 @@ import uvicorn
 
 class SystemData(BaseModel):
     temperature: float
-    battery: int
+    battery: float
 
 
 app = FastAPI()
@@ -145,8 +145,8 @@ async def get_system_mode(request: Request):
 @app.post("/update-temp-limits")
 async def update_temp_limits(request: Request, minTemp= Form(None), maxTemp=Form(None)):
     redirect_url = request.url_for('home')
-    if (minTemp is None or not is_number(minTemp)) and (maxTemp  is None or is_number(maxTemp)):
-        return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER) 
+    if (minTemp is None or not is_number(minTemp)) and (maxTemp  is None or not is_number(maxTemp)):
+        return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
     if minTemp is None or not is_number(minTemp):
         minTemp=app.minTempValue
         if float(maxTemp) < float(app.minTempValue):
@@ -173,7 +173,7 @@ async def update_temp_limits(request: Request, minTemp= Form(None), maxTemp=Form
 async def update_battery_limits(request: Request, minBattery = Form(None), maxBattery=Form(None)):
     redirect_url = request.url_for('home') 
     if (minBattery is None or not is_number(minBattery)) and (maxBattery  is None or not is_number(maxBattery)):
-        return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER) 
+        return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)  
     if minBattery is None or not is_number(minBattery):
         minBattery=app.minBatteryValue
         if maxBattery < app.minBatteryValue:
