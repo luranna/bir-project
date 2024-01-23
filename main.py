@@ -171,28 +171,30 @@ async def update_temp_limits(request: Request, minTemp= Form(None), maxTemp=Form
 
 @app.post("/update-battery-limits")
 async def update_battery_limits(request: Request, minBattery = Form(None), maxBattery=Form(None)):
-    redirect_url = request.url_for('home') 
+    redirect_url = request.url_for('home')
     if (minBattery is None or not is_number(minBattery)) and (maxBattery  is None or not is_number(maxBattery)):
-        return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)  
+        return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
     if minBattery is None or not is_number(minBattery):
         minBattery=app.minBatteryValue
-        if maxBattery < app.minBatteryValue:
+        if float(maxBattery) < float(app.minBatteryValue):
             app.maxBatteryValue = app.minBatteryValue
             app.minBatteryValue = maxBattery
             return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER) 
     if maxBattery is None or not is_number(maxBattery):
-        if minBattery > app.maxBatteryValue:
+        if float(minBattery) > float(app.maxBatteryValue):
             app.minBatteryValue = app.maxBatteryValue
             app.maxBatteryValue = minBattery
             return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER) 
-        maxBattery=app.maxBatteryValue
-    app.minBatteryValue=minBattery
-    app.maxBatteryValue=maxBattery
+        maxBattery=app.maxBatteryValue   
+    minBattery=float(minBattery)
+    maxBattery=float(maxBattery)
+    app.minBatteryValue=round(minBattery,2)
+    app.maxBatteryValue=round(maxBattery,2)
     if app.minBatteryValue > app.maxBatteryValue:
-        app.minBatteryValue , app.maxBatteryValue = app.maxBatteryValue, app.minBatteryValue
+        app.minBatteryValue , app.maxBatteryValue = app.maxBatteryValue, app.minBatteryValue 
     set_system_mode()
     data={"minBatteryValue": app.minBatteryValue,  "maxBatteryValue":app.maxBatteryValue, "systemMode":app.systemMode} 
-    return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER) 
+    return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
 
 def set_system_mode():
     if((app.currentTempValue < app.maxTempValue) and (app.currentTempValue > app.minTempValue) and (app.currentBatteryValue <app.maxBatteryValue) and (app.currentBatteryValue > app.minBatteryValue)):
