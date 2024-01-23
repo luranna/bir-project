@@ -80,8 +80,6 @@ async def login(response: Response, request: Request):
                 )
                 msg = "Login Successful"
                 response = RedirectResponse(url="/")
-                
-             
                 response.set_cookie(
                     key="access_token", value=f"Bearer {jwt_token}", httponly=True
                 )
@@ -220,4 +218,4 @@ def logout(response : Response):
  return response
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, ssl=ssl_context)
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, ssl_certfile="./certs/server_cert.pem", ssl_keyfile="./certs/server_key.pem")
