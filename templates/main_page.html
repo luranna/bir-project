@@ -30,6 +30,7 @@
   <h2>Current system mode: {{data.systemMode}}</h2>
   <h2>Current temperature: {{data.currentTempValue}} &deg Celsius</h2>
   <h2>Current level of battery: {{data.currentBatteryValue}} mV</h2>
+  <h2>Current level of photovoltaic panel: {{data.currentPanelValue}} mV</h2>
   <br>
  
   <h3> Change system mode </h3>
@@ -79,6 +80,20 @@
         <input type="submit" value="Submit">
         </center>
     </form> 
+
+    <h3> Limits for photovoltaic panel operation: </h3>
+    <p>
+      <p> Minimum value: {{data.minPanelValue}} mV</p>
+      
+    </p> 
+      <h3>Change photovoltaic panel limits:</h3>
+      <form method="post" action="/update-panel-limits">
+          <center>
+          <label for="minTemp">Minimum photovoltaic panel value:</label><br>
+          <input type="text" id="minPanel" name="minPanel"><br>
+          <input type="submit" value="Submit">
+          </center>
+      </form> 
 </p>
 </body>
 </html>
