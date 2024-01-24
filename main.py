@@ -28,7 +28,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 app.minTempValue = 20;
 app.maxTempValue = 30;
 app.currentTempValue=-99;
-app.currentBatteryValue=100;
+app.currentBatteryValue=-1;
 app.minBatteryValue = 0;
 app.maxBatteryValue = 1000;
 app.systemMode="Off";
