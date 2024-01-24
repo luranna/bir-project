@@ -233,7 +233,7 @@ async def update_battery_limits(request: Request, minBattery = Form(None), maxBa
         return RedirectResponse(redirect_url, status_code=status.HTTP_302_FOUND)
 
 def set_system_mode():
-    if((app.currentTempValue < app.maxTempValue) and (app.currentTempValue > app.minTempValue) and (app.currentBatteryValue <app.maxBatteryValue) and (app.currentBatteryValue > app.minBatteryValue)):
+    if((app.currentTempValue < app.maxTempValue) and  (app.currentBatteryValue <app.maxBatteryValue) and (app.currentBatteryValue > app.minBatteryValue)):
        app.systemMode="Automatic (On)"
     else:
         app.systemMode="Automatic (Off)"
