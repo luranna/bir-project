@@ -27,11 +27,11 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 app.minTempValue = 20;
 app.maxTempValue = 30;
-app.currentTempValue=23;
+app.currentTempValue=-99;
 app.currentBatteryValue=100;
 app.minBatteryValue = 0;
 app.maxBatteryValue = 1000;
-app.systemMode="On";
+app.systemMode="Off";
 
 
 @app.get("/", include_in_schema=False, response_class=HTMLResponse)
