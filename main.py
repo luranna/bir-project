@@ -16,6 +16,7 @@ import uvicorn
 class SystemData(BaseModel):
     temperature: float
     battery: float
+    panel: float
 
 
 app = FastAPI()
@@ -32,12 +33,13 @@ app.currentBatteryValue=-1;
 app.minBatteryValue = 0;
 app.maxBatteryValue = 1000;
 app.systemMode="Off";
-
+app.currentPanelValue=-1;
+app.minPanelValue=0;
 
 @app.get("/", include_in_schema=False, response_class=HTMLResponse)
 async def home(request: Request, access_token: str = Cookie(None)):
     if access_token is not None:
-        data={"minTempValue": app.minTempValue,  "maxTempValue":app.maxTempValue, "currentTempValue":app.currentTempValue, "currentBatteryValue":app.currentBatteryValue, "minBatteryValue": app.minBatteryValue,  "maxBatteryValue":app.maxBatteryValue, "systemMode":app.systemMode} 
+        data={"minTempValue": app.minTempValue,  "maxTempValue":app.maxTempValue, "currentTempValue":app.currentTempValue, "currentBatteryValue":app.currentBatteryValue, "minBatteryValue": app.minBatteryValue,  "maxBatteryValue":app.maxBatteryValue, "systemMode":app.systemMode, "minPanelValue": app.minPanelValue, "currentPanelValue":app.currentPanelValue} 
         return templates.TemplateResponse("main_page.html", {"request": request,"data": data})
     else:
         redirect_url = request.url_for('login') 
@@ -45,7 +47,7 @@ async def home(request: Request, access_token: str = Cookie(None)):
 
 @app.get("/login/", include_in_schema=False, response_class=HTMLResponse)
 async def home(request: Request):
-    data={"minTempValue": app.minTempValue,  "maxTempValue":app.maxTempValue, "currentTempValue":app.currentTempValue, "currentBatteryValue":app.currentBatteryValue, "minBatteryValue": app.minBatteryValue,  "maxBatteryValue":app.maxBatteryValue, "systemMode":app.systemMode} 
+    data={"minTempValue": app.minTempValue,  "maxTempValue":app.maxTempValue, "currentTempValue":app.currentTempValue, "currentBatteryValue":app.currentBatteryValue, "minBatteryValue": app.minBatteryValue,  "maxBatteryValue":app.maxBatteryValue, "systemMode":app.systemMode, "minPanelValue": app.minPanelValue, "currentPanelValue":app.currentPanelValue} 
     return templates.TemplateResponse("logon_page.html", {"request": request,"data": data})
 
 @app.post("/login/")
@@ -101,7 +103,8 @@ async def receive_data(request: Request, tempData: SystemData, access_token: str
     if access_token is not None:
         app.currentTempValue=round(tempData.temperature,2)
         app.currentBatteryValue=tempData.battery
-        data={"minTempValue": app.minTempValue,  "maxTempValue":app.maxTempValue, "currentTempValue":app.currentTempValue, "currentBatteryValue":app.currentBatteryValue, "minBatteryValue": app.minBatteryValue,  "maxBatteryValue":app.maxBatteryValue, "systemMode":app.systemMode} 
+        app.currentPanelValue=tempData.panel
+        data={"minTempValue": app.minTempValue,  "maxTempValue":app.maxTempValue, "currentTempValue":app.currentTempValue, "currentBatteryValue":app.currentBatteryValue, "minBatteryValue": app.minBatteryValue,  "maxBatteryValue":app.maxBatteryValue, "systemMode":app.systemMode, "minPanelValue": app.minPanelValue, "currentPanelValue":app.currentPanelValue} 
         return data
     else:
         redirect_url = request.url_for('login') 
@@ -112,7 +115,7 @@ async def update_system_mode(request: Request, access_token: str = Cookie(None))
     if access_token is not None:
         redirect_url = request.url_for('home')
         app.systemMode="On"
-        data={"minTempValue": app.minTempValue,  "maxTempValue":app.maxTempValue, "currentTempValue":app.currentTempValue, "currentBatteryValue":app.currentBatteryValue, "minBatteryValue": app.minBatteryValue,  "maxBatteryValue":app.maxBatteryValue, "systemMode":app.systemMode} 
+        data={"minTempValue": app.minTempValue,  "maxTempValue":app.maxTempValue, "currentTempValue":app.currentTempValue, "currentBatteryValue":app.currentBatteryValue, "minBatteryValue": app.minBatteryValue,  "maxBatteryValue":app.maxBatteryValue, "systemMode":app.systemMode, "minPanelValue": app.minPanelValue, "currentPanelValue":app.currentPanelValue} 
         return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
     else:
         redirect_url = request.url_for('login') 
@@ -123,7 +126,7 @@ async def update_system_mode(request: Request, access_token: str = Cookie(None))
     if access_token is not None:
         redirect_url = request.url_for('home')
         app.systemMode="Off"
-        data={"minTempValue": app.minTempValue,  "maxTempValue":app.maxTempValue, "currentTempValue":app.currentTempValue, "currentBatteryValue":app.currentBatteryValue, "minBatteryValue": app.minBatteryValue,  "maxBatteryValue":app.maxBatteryValue, "systemMode":app.systemMode} 
+        data={"minTempValue": app.minTempValue,  "maxTempValue":app.maxTempValue, "currentTempValue":app.currentTempValue, "currentBatteryValue":app.currentBatteryValue, "minBatteryValue": app.minBatteryValue,  "maxBatteryValue":app.maxBatteryValue, "systemMode":app.systemMode, "minPanelValue": app.minPanelValue, "currentPanelValue":app.currentPanelValue} 
         return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
     else:
         redirect_url = request.url_for('login') 
@@ -134,7 +137,7 @@ async def update_system_mode(request: Request, access_token: str = Cookie(None))
     if access_token is not None:
         redirect_url = request.url_for('home')
         set_system_mode()
-        data={"minTempValue": app.minTempValue,  "maxTempValue":app.maxTempValue, "currentTempValue":app.currentTempValue, "currentBatteryValue":app.currentBatteryValue, "minBatteryValue": app.minBatteryValue,  "maxBatteryValue":app.maxBatteryValue, "systemMode":app.systemMode} 
+        data={"minTempValue": app.minTempValue,  "maxTempValue":app.maxTempValue, "currentTempValue":app.currentTempValue, "currentBatteryValue":app.currentBatteryValue, "minBatteryValue": app.minBatteryValue,  "maxBatteryValue":app.maxBatteryValue, "systemMode":app.systemMode, "minPanelValue": app.minPanelValue, "currentPanelValue":app.currentPanelValue} 
         return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
     else:
         redirect_url = request.url_for('login') 
@@ -153,6 +156,15 @@ async def get_temp_limits(request: Request, access_token: str = Cookie(None)):
 async def get_battery_limits(request: Request, access_token: str = Cookie(None)):
     if access_token is not None:
         data={"minBatteryValue": app.minBatteryValue,  "maxBatteryValue":app.maxBatteryValue} 
+        return data
+    else:
+        redirect_url = request.url_for('login') 
+        return RedirectResponse(redirect_url, status_code=status.HTTP_302_FOUND)
+    
+@app.get("/panel_parameters")
+async def get_panel_limits(request: Request, access_token: str = Cookie(None)):
+    if access_token is not None:
+        data={"minPanelValue": app.minPanelValue} 
         return data
     else:
         redirect_url = request.url_for('login') 
@@ -231,9 +243,24 @@ async def update_battery_limits(request: Request, minBattery = Form(None), maxBa
     else:
         redirect_url = request.url_for('login') 
         return RedirectResponse(redirect_url, status_code=status.HTTP_302_FOUND)
+    
+@app.post("/update-panel-limits")
+async def update_panel_limits(request: Request, minPanel = Form(None), access_token: str = Cookie(None)):
+    if access_token is not None:
+        redirect_url = request.url_for('home')
+        if (minPanel is None or not is_number(minPanel)):
+            return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
+        minPanel=float(minPanel)
+        app.minPanelValue=round(minPanel,2)
+        set_system_mode()
+        data={"minPanelValue": app.minPanelValue, "systemMode":app.systemMode} 
+        return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
+    else:
+        redirect_url = request.url_for('login') 
+        return RedirectResponse(redirect_url, status_code=status.HTTP_302_FOUND)
 
 def set_system_mode():
-    if((app.currentTempValue < app.maxTempValue) and  (app.currentBatteryValue <app.maxBatteryValue) and (app.currentBatteryValue > app.minBatteryValue)):
+    if((app.currentTempValue < app.maxTempValue) and  (app.currentBatteryValue <app.maxBatteryValue) and (app.currentBatteryValue > app.minBatteryValue) and (app.currentPanelValue > app.minPanelValue)):
        app.systemMode="Automatic (On)"
     else:
         app.systemMode="Automatic (Off)"
