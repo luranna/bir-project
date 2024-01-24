@@ -22,8 +22,8 @@ users_data = [
         "disabled": False,
     },
     {
-        "username": "User",
-        "hashed_password": "686e2f135da0891ceee1638011a32c269e8f57868d5c3e5fa9e01b14a06f2d61",
+        "username": "Sensor1",
+        "hashed_password": "61229818fe85da341706e1c1ed8b95e9547cf84c005d2e0209ff470615ba499a",
         "isAdmin": False,
         "disabled": False,
     }]
