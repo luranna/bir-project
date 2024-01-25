@@ -17,7 +17,7 @@ SALT = "AVADAKEDAVRA"
 users_data = [
      {
         "username": "Admin",
-        "hashed_password": "686e2f135da0891ceee1638011a32c269e8f57868d5c3e5fa9e01b14a06f2d61",
+        "hashed_password": "ffe979285e9edd4847cca9b34f657d7fe3903be39e32b5aab286421a36547c6a",
         "isAdmin": True,
         "disabled": False,
     },

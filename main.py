@@ -260,7 +260,7 @@ async def update_panel_limits(request: Request, minPanel = Form(None), access_to
         return RedirectResponse(redirect_url, status_code=status.HTTP_302_FOUND)
 
 def set_system_mode():
-    if((app.currentTempValue < app.maxTempValue) and  (app.currentBatteryValue <app.maxBatteryValue) and (app.currentBatteryValue > app.minBatteryValue) and (app.currentPanelValue > app.minPanelValue)):
+    if ((app.currentTempValue < app.maxTempValue) and  (app.currentBatteryValue > app.minBatteryValue)) or ((app.currentTempValue < app.maxTempValue) and (app.currentPanelValue > app.minPanelValue)) or ((app.currentTempValue < app.minTempValue)):
        app.systemMode="Automatic (On)"
     else:
         app.systemMode="Automatic (Off)"
